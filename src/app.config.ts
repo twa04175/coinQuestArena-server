@@ -1,10 +1,14 @@
 import config from "@colyseus/tools";
 // import { monitor } from "@colyseus/monitor";
+import cors from 'cors';
+import path from "path";
 
 /**
  * Import your Room files
  */
 import { MissionRoom } from "./rooms/MissionRoom";
+
+const PUBLIC_DIR = path.resolve(__dirname, "../public"); // 정적 파일 위치 (index.html 포함)
 
 export default config({
 
@@ -13,12 +17,27 @@ export default config({
     },
 
     initializeExpress: (app) => {
+        app.use(
+            cors({
+                origin: [
+                    'http://localhost:7456',
+                    'https://cqa.hustlerholdem.com',
+                ],
+            }),
+        );
+
         /**
          * Bind your custom express routes here:
          * Read more: https://expressjs.com/en/starter/basic-routing.html
          */
         app.get("/hello_world", (req, res) => {
             res.send("It's time to kick ass and chew bubblegum!");
+        });
+
+
+        // ② 루트(/) → index.html 반환
+        app.get("/", (_req, res) => {
+            res.sendFile(path.join(PUBLIC_DIR, "index.html"));
         });
 
         /**
