@@ -16,9 +16,10 @@ module.exports = {
     instances: 1,
     exec_mode: 'fork',
     wait_ready: true,
-    env_production: {
-      NODE_ENV: 'production'
-    }
+    env: {
+      NODE_ENV: 'production',
+      SELF_HOSTNAME: 'localhost',
+    },
   }],
 };
 
