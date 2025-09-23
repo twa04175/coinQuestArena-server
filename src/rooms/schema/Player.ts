@@ -11,11 +11,14 @@ export class Player extends Schema {
 
     // 3) 위치/이동(서버 스냅샷에 필요)
     @type(Movement) movement: Movement = new Movement();
-    @type(Inventory)  inventory: Inventory = new Inventory();
+    @type(Inventory) inventory: Inventory = new Inventory();
+
+    @type("number") money: number; // 보유자산
 
     constructor(name: string = "", sessionId: string = "") {
         super();
         this.id = sessionId;
         this.name = name;
+        this.money = 100000; // 초기 자산
     }
 }
