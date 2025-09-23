@@ -19,22 +19,47 @@
 
     <link rel="stylesheet" type="text/css" href="./style.026c1.css"/>
     <link rel="icon" href="favicon.ico"/>
+    <style>
+      html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: #000; /* 로딩 중 검은 배경 */
+        touch-action: none; /* 모바일 제스처로 확대/스크롤 방지 */
+      }
+      /* Cocos 루트 컨테이너들을 전부 뷰포트에 맞춤 */
+      #GameDiv,
+      #Cocos3dGameContainer {
+        position: fixed;
+        inset: 0;      /* top:0; right:0; bottom:0; left:0 */
+        width: 100vw;
+        height: 100vh;
+      }
+      /* 캔버스가 컨테이너를 완전히 채우도록 */
+      #GameCanvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+      }
+    </style>
   </head>
   <body>
-    <h1 class="header">coinquestarena</h1>
+<!--    <div id="GameDiv" cc_exact_fit_screen="false" style="width: 1280px; height: 960px;">-->
+<!--      <div id="Cocos3dGameContainer">-->
+<!--        <canvas id="GameCanvas" width="1280" height="960" tabindex="99"></canvas>-->
+<!--      </div>-->
+<!--    </div>-->
 
-    <div id="GameDiv" cc_exact_fit_screen="false" style="width: 1280px; height: 960px;">
+    <div id="GameDiv" cc_exact_fit_screen="true">
       <div id="Cocos3dGameContainer">
-        <canvas id="GameCanvas" width="1280" height="960" tabindex="99"></canvas>
+        <canvas id="GameCanvas" tabindex="99"></canvas>
       </div>
     </div>
-    <p class="footer">
-      Created with <a href="https://www.cocos.com/products" title="Cocos Creator">Cocos Creator</a>
-    </p>
     <!-- Polyfills bundle. -->
 
-<script src="src/polyfills.bundle.5adbf.js" charset="utf-8"> </script>    
-
+<script src="src/polyfills.bundle.5adbf.js" charset="utf-8"> </script>
 
 <!-- SystemJS support. -->
 <script src="src/system.bundle.543e6.js" charset="utf-8"> </script>
@@ -43,7 +68,7 @@
 <script src="src/import-map.6ac5e.json" type="systemjs-importmap" charset="utf-8"> </script>
 
 <script>
-    System.import('./index.e5c5b.js').catch(function(err) { console.error(err); })
+    System.import('./index.ec1ea.js').catch(function(err) { console.error(err); })
 </script>
   </body>
 </html>

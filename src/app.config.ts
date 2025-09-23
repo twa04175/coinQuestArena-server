@@ -2,6 +2,8 @@ import config from "@colyseus/tools";
 // import { monitor } from "@colyseus/monitor";
 import cors from 'cors';
 import path from "path";
+import express from "express";
+
 
 /**
  * Import your Room files
@@ -34,6 +36,16 @@ export default config({
             res.send("It's time to kick ass and chew bubblegum!");
         });
 
+        app.use(express.static(PUBLIC_DIR, {
+            index: false,                 // index는 아래 핸들러에서 수동 제공
+            maxAge: "7d",                 // 캐시 전략(원하면 수정)
+            setHeaders: (res, filePath) => {
+                // 해시 파일은 장기 캐시
+                if (/\.[a-f0-9]{8,}\./i.test(filePath)) {
+                    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+                }
+            }
+        }));
 
         // ② 루트(/) → index.html 반환
         app.get("/", (_req, res) => {
