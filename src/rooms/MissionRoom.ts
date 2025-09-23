@@ -1,86 +1,97 @@
-import { Room, Client } from "@colyseus/core";
-import { MissionRoomState } from "./schema/MissionRoomState";
+import {Room, Client} from "@colyseus/core";
+import {MissionRoomState} from "./schema/MissionRoomState";
 import {Player} from "./schema/Player";
 
 export class MissionRoom extends Room<MissionRoomState> {
-  maxClients = 20;
-  state = new MissionRoomState();
-  private static roomCounter = 0;
+    maxClients = 20;
+    state = new MissionRoomState();
+    private static roomCounter = 0;
 
-  private readonly tickRate = 20;
-  private readonly dt = 1 / this.tickRate;
+    private readonly tickRate = 20;
+    private readonly dt = 1 / this.tickRate;
 
-  onCreate (options: any) {
-    MissionRoom.roomCounter++;
-    this.state.id = MissionRoom.roomCounter;
-    this.onMessage("moveInput", (client, data: { seq?: number; x: number; y: number }) => {
+    onCreate(options: any) {
+        MissionRoom.roomCounter++;
+        this.state.id = MissionRoom.roomCounter;
+        this.onMessage("moveInput", (client, data: { seq?: number; x: number; y: number }) => {
 
-      const p = this.state.players.get(client.sessionId);
-      if (!p) return;
+            const p = this.state.players.get(client.sessionId);
+            if (!p) return;
 
-      const mv = p.movement;
-      const ix = Number(data?.x);
-      const iy = Number(data?.y);
-      if (!Number.isFinite(ix) || !Number.isFinite(iy)) return;
+            const mv = p.movement;
+            const ix = Number(data?.x);
+            const iy = Number(data?.y);
+            if (!Number.isFinite(ix) || !Number.isFinite(iy)) return;
 
-      const len = Math.hypot(ix, iy);
-      if (len > 0.0001) {
-        mv.dirX = ix / len;
-        mv.dirY = iy / len;
-      } else {
-        mv.dirX = 0; mv.dirY = 0;
-      }
+            const len = Math.hypot(ix, iy);
+            if (len > 0.0001) {
+                mv.dirX = ix / len;
+                mv.dirY = iy / len;
+            } else {
+                mv.dirX = 0;
+                mv.dirY = 0;
+            }
 
-      if (typeof data?.seq === "number") {
-        mv.lastProcessedInput = data.seq;
-      }
+            if (typeof data?.seq === "number") {
+                mv.lastProcessedInput = data.seq;
+            }
 
-      mv.lastUpdateAt = Date.now();
-    });
+            mv.lastUpdateAt = Date.now();
+        });
 
-    this.setSimulationInterval(() => this.moveSimulation(), 1000 / this.tickRate);
-  }
+        this.onMessage("chatInput", (client, data: { msg: string }) => {
+            const p = this.state.players.get(client.sessionId);
+            if (!p) return;
 
-  onJoin (client: Client, options: any) {
-    console.log(client.sessionId, "joined!", options);
-    this.state.players.set(client.sessionId, new Player(options?.name??"", client.sessionId));
-  }
+            const msg = (data?.msg ?? "").substring(0, 100).trim();
+            console.log("chatInput", client.sessionId, msg);
+            p.msg = msg;
+            p.lastMsg = Date.now();
+        })
 
-  onLeave (client: Client, consented: boolean) {
-    console.log(client.sessionId, "left!");
+        this.setSimulationInterval(() => this.moveSimulation(), 1000 / this.tickRate);
+    }
 
-    this.state.players.delete(client.sessionId);
-  }
+    onJoin(client: Client, options: any) {
+        console.log(client.sessionId, "joined!", options);
+        this.state.players.set(client.sessionId, new Player(options?.name ?? "", client.sessionId));
+    }
 
-  onDispose() {
-    console.log("room", this.roomId, "disposing...");
-  }
+    onLeave(client: Client, consented: boolean) {
+        console.log(client.sessionId, "left!");
 
-  private moveSimulation() {
-    const now = Date.now();
-    const W = this.state.width, H = this.state.height;
-    const halfW = W / 2, halfH = H / 2;
+        this.state.players.delete(client.sessionId);
+    }
 
-    this.state.tick++;
+    onDispose() {
+        console.log("room", this.roomId, "disposing...");
+    }
 
-    this.state.players.forEach((p) => {
-      const mv = p.movement;
+    private moveSimulation() {
+        const now = Date.now();
+        const W = this.state.width, H = this.state.height;
+        const halfW = W / 2, halfH = H / 2;
 
-      const speed = Math.min(mv.speed, mv.maxSpeed);
-      const vx = mv.dirX * speed;
-      const vy = mv.dirY * speed;
+        this.state.tick++;
 
-      mv.x += vx * this.dt;
-      mv.y += vy * this.dt;
+        this.state.players.forEach((p) => {
+            const mv = p.movement;
 
-      // 중앙 기준 경계
-      if (mv.x < -halfW) mv.x = -halfW;
-      if (mv.x >  halfW) mv.x =  halfW;
-      if (mv.y < -halfH) mv.y = -halfH;
-      if (mv.y >  halfH) mv.y =  halfH;
+            const speed = Math.min(mv.speed, mv.maxSpeed);
+            const vx = mv.dirX * speed;
+            const vy = mv.dirY * speed;
 
-      mv.tick = this.state.tick;
-      mv.lastUpdateAt = now;
-    });
-  }
+            mv.x += vx * this.dt;
+            mv.y += vy * this.dt;
+
+            // 중앙 기준 경계
+            if (mv.x < -halfW) mv.x = -halfW;
+            if (mv.x > halfW) mv.x = halfW;
+            if (mv.y < -halfH) mv.y = -halfH;
+            if (mv.y > halfH) mv.y = halfH;
+
+            mv.tick = this.state.tick;
+            mv.lastUpdateAt = now;
+        });
+    }
 }
