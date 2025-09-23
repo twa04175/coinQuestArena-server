@@ -9,7 +9,7 @@ const os = require('os');
 module.exports = {
   apps : [{
     port: 3012,
-    name: 'colyseus-app',
+    name: 'cqa-server',
     script: 'build/index.js',
     time: true,
     watch: false,
