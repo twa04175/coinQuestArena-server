@@ -13,30 +13,29 @@ export class MissionRoom extends Room<MissionRoomState> {
   onCreate (options: any) {
     MissionRoom.roomCounter++;
     this.state.id = MissionRoom.roomCounter;
-
     this.onMessage("moveInput", (client, data: { seq?: number; x: number; y: number }) => {
-      const player = this.state.players.get(client.sessionId);
-      if (!player) return;
 
+      const p = this.state.players.get(client.sessionId);
+      if (!p) return;
+
+      const mv = p.movement;
       const ix = Number(data?.x);
       const iy = Number(data?.y);
       if (!Number.isFinite(ix) || !Number.isFinite(iy)) return;
 
-      // 정규화(대각 가속 방지)
       const len = Math.hypot(ix, iy);
       if (len > 0.0001) {
-        player.dirX = ix / len;
-        player.dirY = iy / len;
+        mv.dirX = ix / len;
+        mv.dirY = iy / len;
       } else {
-        player.dirX = 0;
-        player.dirY = 0;
+        mv.dirX = 0; mv.dirY = 0;
       }
 
       if (typeof data?.seq === "number") {
-        player.lastProcessedInput = data.seq;
+        mv.lastProcessedInput = data.seq;
       }
 
-      player.lastUpdateAt = Date.now();
+      mv.lastUpdateAt = Date.now();
     });
 
     this.setSimulationInterval(() => this.moveSimulation(), 1000 / this.tickRate);
@@ -59,31 +58,29 @@ export class MissionRoom extends Room<MissionRoomState> {
 
   private moveSimulation() {
     const now = Date.now();
-    const W = this.state.width;
-    const H = this.state.height;
-
-    const halfW = W / 2;
-    const halfH = H / 2;
+    const W = this.state.width, H = this.state.height;
+    const halfW = W / 2, halfH = H / 2;
 
     this.state.tick++;
 
     this.state.players.forEach((p) => {
-      const speed = Math.min(p.speed, p.maxSpeed);
+      const mv = p.movement;
 
-      const vx = p.dirX * speed;
-      const vy = p.dirY * speed;
+      const speed = Math.min(mv.speed, mv.maxSpeed);
+      const vx = mv.dirX * speed;
+      const vy = mv.dirY * speed;
 
-      p.x += vx * this.dt;
-      p.y += vy * this.dt;
+      mv.x += vx * this.dt;
+      mv.y += vy * this.dt;
 
-      // --- 중앙 기준 경계 클램프 ---
-      if (p.x < -halfW) p.x = -halfW;
-      if (p.x > halfW)  p.x = halfW;
-      if (p.y < -halfH) p.y = -halfH;
-      if (p.y > halfH)  p.y = halfH;
+      // 중앙 기준 경계
+      if (mv.x < -halfW) mv.x = -halfW;
+      if (mv.x >  halfW) mv.x =  halfW;
+      if (mv.y < -halfH) mv.y = -halfH;
+      if (mv.y >  halfH) mv.y =  halfH;
 
-      p.tick = this.state.tick;
-      p.lastUpdateAt = now;
+      mv.tick = this.state.tick;
+      mv.lastUpdateAt = now;
     });
   }
 }
