@@ -2,73 +2,86 @@
 <html>
   <head>
     <meta charset="utf-8">
-
-    <title>Cocos Creator | coinquestarena</title>
-
-    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1,minimal-ui=true"/>
+    <title>coinquestarena</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,minimal-ui=true"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="mobile-web-app-capable" content="yes"/>
     <meta name="full-screen" content="yes"/>
     <meta name="screen-orientation" content="portrait"/>
     <meta name="x5-fullscreen" content="true"/>
     <meta name="360-fullscreen" content="true"/>
-
     <meta name="renderer" content="webkit"/>
     <meta name="force-rendering" content="webkit"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-
     <link rel="stylesheet" type="text/css" href="./style.026c1.css"/>
     <link rel="icon" href="favicon.ico"/>
     <style>
       html, body {
-        height: 100%;
-        width: 100%;
         margin: 0;
-        padding: 0;
+        height: 100%;
+        background: #000;
         overflow: hidden;
-        background: #000; /* 로딩 중 검은 배경 */
-        touch-action: none; /* 모바일 제스처로 확대/스크롤 방지 */
       }
-      /* Cocos 루트 컨테이너들을 전부 뷰포트에 맞춤 */
-      #GameDiv,
-      #Cocos3dGameContainer {
+      #GameDiv, #Cocos3dGameContainer {
         position: fixed;
-        inset: 0;      /* top:0; right:0; bottom:0; left:0 */
-        width: 100vw;
-        height: 100vh;
+        inset: 0;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
-      /* 캔버스가 컨테이너를 완전히 채우도록 */
-      #GameCanvas {
-        width: 100% !important;
-        height: 100% !important;
-        display: block;
-      }
+      .header, .footer { display: none; }
+      #GameCanvas { display: block; }
     </style>
   </head>
   <body>
-<!--    <div id="GameDiv" cc_exact_fit_screen="false" style="width: 1280px; height: 960px;">-->
-<!--      <div id="Cocos3dGameContainer">-->
-<!--        <canvas id="GameCanvas" width="1280" height="960" tabindex="99"></canvas>-->
-<!--      </div>-->
-<!--    </div>-->
-
-    <div id="GameDiv" cc_exact_fit_screen="true">
+    <div id="GameDiv">
       <div id="Cocos3dGameContainer">
-        <canvas id="GameCanvas" tabindex="99"></canvas>
+        <canvas id="GameCanvas" width="1280" height="960" tabindex="99"></canvas>
       </div>
     </div>
+
     <!-- Polyfills bundle. -->
 
-<script src="src/polyfills.bundle.5adbf.js" charset="utf-8"> </script>
+<script src="src/polyfills.bundle.5adbf.js" charset="utf-8"> </script>    
+
 
 <!-- SystemJS support. -->
 <script src="src/system.bundle.543e6.js" charset="utf-8"> </script>
 
 <!-- Import map -->
-<script src="src/import-map.6ac5e.json" type="systemjs-importmap" charset="utf-8"> </script>
+<script src="src/import-map.aaf41.json" type="systemjs-importmap" charset="utf-8"> </script>
 
 <script>
-    System.import('./index.ec1ea.js').catch(function(err) { console.error(err); })
+    System.import('./index.93973.js').catch(function(err) { console.error(err); })
 </script>
+
+    <script>
+      (function () {
+        const CANVAS_W = 1280;
+        const CANVAS_H = 960;
+        const canvas = document.getElementById('GameCanvas');
+
+        function fit() {
+          const ww = window.innerWidth;
+          const wh = window.innerHeight;
+          const scale = Math.min(ww / CANVAS_W, wh / CANVAS_H);
+          const w = Math.round(CANVAS_W * scale);
+          const h = Math.round(CANVAS_H * scale);
+          canvas.style.width = w + 'px';
+          canvas.style.height = h + 'px';
+        }
+
+        fit();
+
+        let rto;
+        window.addEventListener('resize', function () {
+          clearTimeout(rto);
+          rto = setTimeout(function () {
+            location.reload();
+          }, 200);
+        });
+      })();
+    </script>
   </body>
 </html>
