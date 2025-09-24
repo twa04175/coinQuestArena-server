@@ -6,13 +6,13 @@ export class Movement extends Schema {
     @type("number") y: number = 0;
     @type("number") dirX: number = 0;     // 입력 방향(-1..1)
     @type("number") dirY: number = 0;
-    @type("number") speed: number = 200;  // px/s (서버 권위)
+    @type("number") speed: number = 400;  // px/s (서버 권위)
 
     // 보간/동기화
     @type("number") tick: number = 0;     // 서버 틱
     @type("number") lastProcessedInput: number = 0; // 클라 보정 ACK
 
     // 안전/검증
-    @type("number") maxSpeed: number = 300;
+    @type("number") maxSpeed: number = 500;
     @type("number") lastUpdateAt: number = 0;       // 서버 갱신 시각(ms)
 }

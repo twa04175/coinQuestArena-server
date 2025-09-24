@@ -54,7 +54,8 @@ export class MissionRoom extends Room<MissionRoomState> {
 
     onJoin(client: Client, options: any) {
         console.log(client.sessionId, "joined!", options);
-        this.state.players.set(client.sessionId, new Player(options?.name ?? "", client.sessionId));
+        this.state.players.set(client.sessionId, new Player(options?.name ?? "", options?.color??"" , client.sessionId));
+        client.send('map', {tiles:this.state.field.tiles})
     }
 
     onLeave(client: Client, consented: boolean) {
