@@ -12,7 +12,7 @@ export function tileToWorld(field: Field, tx: number, ty: number) {
 }
 
 export function inBounds(field: Field, tx: number, ty: number) {
-    return tx >= 0 && ty >= 0 && tx < field.tilesWide && ty < field.tilesHigh;
+    return tx >= 0 && ty >= 0 && tx < field.wCnt && ty < field.hCnt;
 }
 
 export function setTile(field: Field, tx: number, ty: number, tile: number) {
@@ -95,8 +95,8 @@ export function applyAscii(field: Field, ascii: string[]) {
     const H = ascii.length;
     const W = ascii[0]?.length ?? 0;
 
-    field.tilesWide = W;
-    field.tilesHigh = H;
+    field.wCnt = W;
+    field.hCnt = H;
 
     field.tiles.length = 0;
     for (let i = 0; i < W * H; i++) field.tiles.push(TileKind.Floor);

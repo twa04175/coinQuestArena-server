@@ -15,7 +15,16 @@ export class Prop extends Schema {
     @type("int16") w: number = 16;
     @type("int16") h: number = 16;
 
-    @type("uint8") collider: ColliderType = ColliderType.None;
+    collider: ColliderType = ColliderType.None;
 
     @type({ map: "string" }) props = new MapSchema<string>();
+}
+
+export type Collider ={
+    id:string,
+    x:number,
+    y:number,
+    w:number,
+    h:number
+    type:ColliderType
 }

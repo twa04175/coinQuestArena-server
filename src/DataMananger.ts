@@ -1,3 +1,15 @@
+import {Collider, ColliderType} from "./rooms/schema/Prop";
+
+type EditorColliderData = {
+    id:string,
+    x:number,
+    y:number,
+    offSetX:number,
+    offsetY:number,
+    width:number,
+    height:number
+}
+
 export class DataManager {
     private static _instance: DataManager;
 
@@ -24,6 +36,18 @@ export class DataManager {
         { "id": "PETROCHEM_CO", "name": "석유화학사", "description": "원유에서 플라스틱·합성섬유 등을 생산하는 기업.", "tier": 3 }
     ]
 
+    private initCollisionData:EditorColliderData[] = [
+        {
+            id:"build_bank",
+            x:-450,
+            y: 0,
+            offSetX:0,
+            offsetY:86,
+            width:320,
+            height:208
+        }
+    ]
+
     getItemData(itemId:string){
         console.log('get item data ',itemId);
         return this.itemData.find(item=>item.id === itemId);
@@ -31,5 +55,20 @@ export class DataManager {
 
     getAllItemKeys(): string[] {
         return this.itemData.map(item => item.id);
+    }
+
+    getInitCollisionData():Collider[]{
+        return this.initCollisionData.map(item=>this.calcOffset(item));
+    }
+
+    calcOffset(editorData:EditorColliderData): Collider{
+        return {
+            id: editorData.id,
+            x: editorData.x + editorData.offSetX,
+            y: editorData.y + editorData.offsetY,
+            w: editorData.width,
+            h: editorData.height,
+            type:ColliderType.Solid
+        }
     }
 }

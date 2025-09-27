@@ -1,18 +1,22 @@
 import {Room, Client} from "@colyseus/core";
 import {MissionRoomState} from "./schema/MissionRoomState";
 import {Player} from "./schema/Player";
+import {Collider, ColliderType} from "./schema/Prop";
+import {PhysicsWorld} from "../PhysicsWorld";
 
 export class MissionRoom extends Room<MissionRoomState> {
     maxClients = 20;
     state = new MissionRoomState();
     private static roomCounter = 0;
-
     private readonly tickRate = 20;
     private readonly dt = 1 / this.tickRate;
+    private physicsWorld: PhysicsWorld;
 
     onCreate(options: any) {
         MissionRoom.roomCounter++;
         this.state.id = MissionRoom.roomCounter;
+        this.physicsWorld = new PhysicsWorld();
+
         this.onMessage("moveInput", (client, data: { seq?: number; x: number; y: number }) => {
 
             const p = this.state.players.get(client.sessionId);
@@ -38,7 +42,6 @@ export class MissionRoom extends Room<MissionRoomState> {
 
             mv.lastUpdateAt = Date.now();
         });
-
         this.onMessage("chatInput", (client, data: { msg: string }) => {
             const p = this.state.players.get(client.sessionId);
             if (!p) return;
@@ -49,7 +52,27 @@ export class MissionRoom extends Room<MissionRoomState> {
             p.lastMsg = Date.now();
         })
 
-        this.setSimulationInterval(() => this.moveSimulation(), 1000 / this.tickRate);
+        this.physicsWorld.init(this.tickRate, this.state);
+        this.setSimulationInterval(() => {
+            this.physicsWorld.simulate()
+
+            if(process.env.NODE_ENV !== 'production') {
+                let newPlayerPos:Collider[] = [];
+                this.state.field.colliders.forEach(collider => {
+                    newPlayerPos.push(collider);
+                })
+
+                this.state.players.forEach((p)=>{
+                    newPlayerPos.push(this.physicsWorld.getPlayerPhysicsState(p.id, p.movement));
+                })
+
+                this.clients.forEach((client: Client) => {
+                    client.send('debug-colliders',{
+                        colliders: newPlayerPos
+                    })
+                })
+            }
+        }, 1000 / this.tickRate);
     }
 
     onJoin(client: Client, options: any) {
@@ -66,33 +89,5 @@ export class MissionRoom extends Room<MissionRoomState> {
 
     onDispose() {
         console.log("room", this.roomId, "disposing...");
-    }
-
-    private moveSimulation() {
-        const now = Date.now();
-        const W = this.state.width, H = this.state.height;
-        const halfW = W / 2, halfH = H / 2;
-
-        this.state.tick++;
-
-        this.state.players.forEach((p) => {
-            const mv = p.movement;
-
-            const speed = Math.min(mv.speed, mv.maxSpeed);
-            const vx = mv.dirX * speed;
-            const vy = mv.dirY * speed;
-
-            mv.x += vx * this.dt;
-            mv.y += vy * this.dt;
-
-            // 중앙 기준 경계
-            if (mv.x < -halfW) mv.x = -halfW;
-            if (mv.x > halfW) mv.x = halfW;
-            if (mv.y < -halfH) mv.y = -halfH;
-            if (mv.y > halfH) mv.y = halfH;
-
-            mv.tick = this.state.tick;
-            mv.lastUpdateAt = now;
-        });
     }
 }
