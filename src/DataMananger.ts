@@ -45,6 +45,24 @@ export class DataManager {
             offsetY:86,
             width:320,
             height:208
+        },
+        {
+            id:"build_leaderboard",
+            x:-2.789,
+            y: 376.283,
+            offSetX:0,
+            offsetY:8.9,
+            width:194.474,
+            height:61.46
+        },
+        {
+            id:"build_exchange",
+            x:548.492,
+            y: -33.05,
+            offSetX:0,
+            offsetY:117.6,
+            width:440,
+            height:235.1
         }
     ]
 

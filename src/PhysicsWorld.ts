@@ -80,11 +80,11 @@ export class PhysicsWorld {
             }
 
             // --- 충돌 로그 출력(있을 때만) ---
-            if (hitIds.size > 0) {
-                console.log(
-                    `[collision] tick=${this.state.tick} player=${p.id} collidedWith=[${[...hitIds].join(", ")}]`
-                );
-            }
+            // if (hitIds.size > 0) {
+            //     console.log(
+            //         `[collision] tick=${this.state.tick} player=${p.id} collidedWith=[${[...hitIds].join(", ")}]`
+            //     );
+            // }
 
             // --- 경계 클램프(맵 중앙 기준) ---
             if (nextX < -halfW) nextX = -halfW;
