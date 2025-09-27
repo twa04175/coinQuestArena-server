@@ -2,7 +2,8 @@ import SAT from "sat";
 import {MissionRoomState} from "./rooms/schema/MissionRoomState";
 import {Collider, ColliderType} from "./rooms/schema/Prop";
 import {Movement} from "./rooms/schema/Movement";
-const { Box, Vector, Response } = SAT;
+
+const {Box, Vector, Response} = SAT;
 
 export class PhysicsWorld {
     private state: MissionRoomState;
@@ -22,11 +23,11 @@ export class PhysicsWorld {
     }
 
     private pCenter(px: number, py: number) {
-        return { cx: px + this.playerXOffset, cy: py + this.playerYOffset };
+        return {cx: px + this.playerXOffset, cy: py + this.playerYOffset};
     }
 
     private isCollideWith(px: number, py: number, col: Collider): boolean {
-        const { cx, cy } = this.pCenter(px, py);
+        const {cx, cy} = this.pCenter(px, py);
 
         const halfPw = this.playerW / 2;
         const halfPh = this.playerH / 2;
@@ -69,15 +70,12 @@ export class PhysicsWorld {
                 if (this.isCollideWith(nextX, mv.y, c)) {
                     nextX = mv.x; // X 이동 취소
                     hitIds.add(c.id);
-                    // 축 정보까지 보고 싶으면:
-                    // console.log(`[hit:X] player=${p.id} collider=${c.id}`);
                 }
 
                 // Y축 시도 (X 결과 반영 후 검사)
                 if (this.isCollideWith(nextX, nextY, c)) {
                     nextY = mv.y; // Y 이동 취소
                     hitIds.add(c.id);
-                    // console.log(`[hit:Y] player=${p.id} collider=${c.id}`);
                 }
             }
 
@@ -90,9 +88,9 @@ export class PhysicsWorld {
 
             // --- 경계 클램프(맵 중앙 기준) ---
             if (nextX < -halfW) nextX = -halfW;
-            if (nextX >  halfW) nextX =  halfW;
+            if (nextX > halfW) nextX = halfW;
             if (nextY < -halfH) nextY = -halfH;
-            if (nextY >  halfH) nextY =  halfH;
+            if (nextY > halfH) nextY = halfH;
 
             // 최종 반영
             mv.x = nextX;
@@ -102,8 +100,8 @@ export class PhysicsWorld {
         });
     }
 
-    getPlayerPhysicsState(id:string,mv:Movement) :Collider{
-        const { cx, cy } = this.pCenter(mv.x, mv.y);
+    getPlayerPhysicsState(id: string, mv: Movement): Collider {
+        const {cx, cy} = this.pCenter(mv.x, mv.y);
 
         return {
             id: id,
