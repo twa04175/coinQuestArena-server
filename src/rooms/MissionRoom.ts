@@ -56,22 +56,22 @@ export class MissionRoom extends Room<MissionRoomState> {
         this.setSimulationInterval(() => {
             this.physicsWorld.simulate()
 
-            if(process.env.NODE_ENV !== 'production') {
-                let newPlayerPos:Collider[] = [];
-                this.state.field.colliders.forEach(collider => {
-                    newPlayerPos.push(collider);
-                })
-
-                this.state.players.forEach((p)=>{
-                    newPlayerPos.push(this.physicsWorld.getPlayerPhysicsState(p.id, p.movement));
-                })
-
-                this.clients.forEach((client: Client) => {
-                    client.send('debug-colliders',{
-                        colliders: newPlayerPos
-                    })
-                })
-            }
+            // if(process.env.NODE_ENV !== 'production') {
+            //     let newPlayerPos:Collider[] = [];
+            //     this.state.field.colliders.forEach(collider => {
+            //         newPlayerPos.push(collider);
+            //     })
+            //
+            //     this.state.players.forEach((p)=>{
+            //         newPlayerPos.push(this.physicsWorld.getPlayerPhysicsState(p.id, p.movement));
+            //     })
+            //
+            //     this.clients.forEach((client: Client) => {
+            //         client.send('debug-colliders',{
+            //             colliders: newPlayerPos
+            //         })
+            //     })
+            // }
         }, 1000 / this.tickRate);
     }
 
